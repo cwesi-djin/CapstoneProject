@@ -1,0 +1,15 @@
+{% extends "api/base.html" %}
+
+{% block content %}
+    <h1>Login into your account</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.as_p }}
+
+    <button type="submit">Log in</button>
+</form>
+
+    <a href="{% url 'register' %}">Register</a>
+{% endblock %}
