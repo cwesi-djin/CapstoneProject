@@ -60,6 +60,12 @@ def get_profile_image_path(self, filename):
 # Create your models here.
 # Create customers, admins, and sellers with different permissions.
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    ROLE_CHOICES = (
+        ('customer', 'Customer'),
+        ('seller', 'Seller'),
+        ('admin', 'Admin'),
+    )
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(verbose_name="email", unique=True, blank=False)
     is_superuser = models.BooleanField(default=False)
@@ -97,7 +103,7 @@ class Order(models.Model):
         CANCELLED = 'Cancelled'
 
     order_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
@@ -170,12 +176,12 @@ class Product(models.Model):
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     session_key = models.CharField(max_length=40, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
-    def cart_total(self):
+    def get_total(self):
         return sum(item.subtotal for item in self.cartitem_set.all())
 
     def __str__(self):
@@ -222,7 +228,7 @@ class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=Order.Status.PENDING)
+    status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
     transaction_id = models.CharField(max_length=128, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
