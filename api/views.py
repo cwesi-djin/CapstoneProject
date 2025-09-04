@@ -27,7 +27,6 @@ def home(request):
 def is_seller(user):
     return user.role == "seller" or user.is_superuser
 
-@user_passes_test(is_seller)
 def create_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)

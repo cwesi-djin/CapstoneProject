@@ -8,6 +8,7 @@
         <p>You are logged in.</p>
         <p>want to view our products</p>
         <a href="{% url 'product-list' %}">Products</a><br>
+        <a href="{% url 'product-create' %}">Add new product to you catalogue</a><br>
         <a href="{% url 'logout' %}">Logout</a>
     {% else %}
         <p>You are not logged in.</p>
